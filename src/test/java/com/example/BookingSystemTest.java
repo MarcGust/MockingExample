@@ -82,5 +82,25 @@ class BookingSystemTest {
 
         verifyNoInteractions(notificationService);
     }
+
+    @Test
+    void shouldBookRoomSuccessfullyButStillThrowNotificationException() throws NotificationException {
+        String roomId = "room1";
+        LocalDateTime startTime = LocalDateTime.now().plusHours(2);
+        LocalDateTime endTime = startTime.plusHours(1);
+
+        Room room = mock(Room.class);
+        when(room.isAvailable(startTime, endTime)).thenReturn(true);
+        when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
+
+        doThrow(new NotificationException("Test exception")).when(notificationService).sendBookingConfirmation(any(Booking.class));
+
+        boolean bookedRoom = bookingSystem.bookRoom(roomId, startTime, endTime);
+
+        assertThat(bookedRoom).isTrue();
+        verify(room).addBooking(any(Booking.class));
+        verify(roomRepository).save(room);
+        verify(notificationService).sendBookingConfirmation(any(Booking.class));
+    }
 }
 
