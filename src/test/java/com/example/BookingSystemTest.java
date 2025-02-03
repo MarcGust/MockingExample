@@ -54,5 +54,18 @@ class BookingSystemTest {
         verify(roomRepository).save(room);
         verify(notificationService).sendBookingConfirmation(any(Booking.class));
     }
+
+    @Test
+    void shouldThrowExceptionForWrongTime() {
+        String roomId = "room1";
+        LocalDateTime startTime = LocalDateTime.now().plusHours(1);
+        LocalDateTime endTime = startTime.minusHours(1);
+
+        assertThatThrownBy(() -> bookingSystem.bookRoom(roomId, startTime, endTime))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Sluttid måste vara efter starttid");
+
+        verifyNoInteractions(roomRepository, notificationService);
+    }
 }
 
