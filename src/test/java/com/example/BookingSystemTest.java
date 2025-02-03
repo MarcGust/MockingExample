@@ -67,5 +67,20 @@ class BookingSystemTest {
 
         verifyNoInteractions(roomRepository, notificationService);
     }
+
+    @Test
+    void shouldThrowExceptionForWrongRoomId() {
+        String roomId = "roomX";
+        LocalDateTime startTime = LocalDateTime.now().plusHours(1);
+        LocalDateTime endTime = startTime.plusHours(1);
+
+        when(roomRepository.findById(roomId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> bookingSystem.bookRoom(roomId, startTime, endTime))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Rummet existerar inte");
+
+        verifyNoInteractions(notificationService);
+    }
 }
 
