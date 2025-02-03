@@ -1,5 +1,6 @@
 package com.example;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -14,6 +15,7 @@ import static org.assertj.core.api.Assertions.*;
 class BookingSystemTest {
 
     private BookingSystem bookingSystem;
+    private AutoCloseable mocks;
 
     @Mock
     private RoomRepository roomRepository;
@@ -24,10 +26,15 @@ class BookingSystemTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        mocks = MockitoAnnotations.openMocks(this);
         bookingSystem = new BookingSystem(timeProvider, roomRepository, notificationService);
 
         when(timeProvider.getCurrentTime()).thenReturn(LocalDateTime.now());
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        mocks.close();
     }
 
     @Test
