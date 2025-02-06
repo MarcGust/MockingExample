@@ -133,4 +133,81 @@ class BookingSystemTest {
 
         verifyNoInteractions(notificationService);
     }
+
+    @ParameterizedTest
+    @CsvSource({
+            "'null', '2025-01-01T12:00', 'Måste ange både start- och sluttid'",
+            "'2025-01-01T10:00', 'null', 'Måste ange både start- och sluttid'",
+            "'2025-01-01T12:00', '2025-01-01T11:00', 'Sluttid måste vara efter starttid'"
+    })
+    void shouldThrowExceptionForWrongTimeParameters(String startTimeStr, String endTimeStr, String expectedMessage) {
+        LocalDateTime startTime = "null".equals(startTimeStr) ? null : LocalDateTime.parse(startTimeStr);
+        LocalDateTime endTime = "null".equals(endTimeStr) ? null : LocalDateTime.parse(endTimeStr);
+
+        assertThatThrownBy(() -> bookingSystem.getAvailableRooms(startTime, endTime))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(expectedMessage);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "'2025-01-01T10:00', '2025-01-01T12:00', 1",
+            "'2025-01-01T12:00', '2025-01-01T14:00', 0"
+    })
+    void shouldReturnAvailableRoomsForCorrectTimeParameters(String startTimeStr, String endTimeStr, int expectedRoomCount) {
+        LocalDateTime startTime = LocalDateTime.parse(startTimeStr);
+        LocalDateTime endTime = LocalDateTime.parse(endTimeStr);
+
+        Room room1 = mock(Room.class);
+        Room room2 = mock(Room.class);
+
+        when(room1.isAvailable(startTime, endTime)).thenReturn(true);
+        when(room2.isAvailable(startTime, endTime)).thenReturn(false);
+
+        if (expectedRoomCount == 0) {
+            when(room1.isAvailable(startTime, endTime)).thenReturn(false);
+            when(room2.isAvailable(startTime, endTime)).thenReturn(false);
+        }
+
+        when(roomRepository.findAll()).thenReturn(List.of(room1, room2));
+
+        List<Room> availableRooms = bookingSystem.getAvailableRooms(startTime, endTime);
+        assertThat(availableRooms).hasSize(expectedRoomCount);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "'2025-01-01T10:00', '2025-01-01T12:00', 1",
+            "'2025-01-01T12:00', '2025-01-01T14:00', 0"
+    })
+    void shouldReturnCorrectAvailableRooms(String startTimeString, String endTimeString, int expectedRoomCount) {
+        LocalDateTime startTime = LocalDateTime.parse(startTimeString);
+        LocalDateTime endTime = LocalDateTime.parse(endTimeString);
+
+        Room room1 = mock(Room.class);
+        Room room2 = mock(Room.class);
+
+        when(room1.getName()).thenReturn("Room1");
+        when(room2.getName()).thenReturn("Room2");
+
+        when(room1.isAvailable(startTime, endTime)).thenReturn(true);
+        when(room2.isAvailable(startTime, endTime)).thenReturn(false);
+
+        if (expectedRoomCount == 0) {
+            when(room1.isAvailable(startTime, endTime)).thenReturn(false);
+            when(room2.isAvailable(startTime, endTime)).thenReturn(false);
+        }
+
+        when(roomRepository.findAll()).thenReturn(List.of(room1, room2));
+
+        List<Room> availableRooms = bookingSystem.getAvailableRooms(startTime, endTime);
+
+        assertThat(availableRooms).hasSize(expectedRoomCount);
+
+        if (expectedRoomCount == 1) {
+            assertThat(availableRooms.get(0).getName()).isEqualTo("Room1");
+        } else {
+            assertThat(availableRooms).isEmpty();
+        }
+    }
 }
