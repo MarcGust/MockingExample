@@ -13,5 +13,13 @@ public class ShoppingCart {
     public int getItemsCount() {
         return items.size();
     }
+
+    public void deleteItem(String itemName) {
+        items.remove(itemName);
+    }
+
+    public boolean containsItem(String itemName) {
+        return items.contains(itemName);
+    }
 }
 
