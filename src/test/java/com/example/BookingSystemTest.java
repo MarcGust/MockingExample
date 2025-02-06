@@ -210,4 +210,24 @@ class BookingSystemTest {
             assertThat(availableRooms).isEmpty();
         }
     }
+
+    @ParameterizedTest
+    @CsvSource({
+            "'null', '2025-01-01T12:00', 'Bokning kräver giltiga start- och sluttider samt rum-id'",
+            "'2025-01-01T12:00', 'null', 'Bokning kräver giltiga start- och sluttider samt rum-id'",
+            "'null', 'null', 'Bokning kräver giltiga start- och sluttider samt rum-id'",
+            "'null', '2025-01-01T12:00', 'Bokning kräver giltiga start- och sluttider samt rum-id'",
+    })
+    void shouldThrowExceptionWhenParametersAreNull(String startTimeStr, String endTimeStr, String expectedMessage) {
+        LocalDateTime startTime = "null".equals(startTimeStr) ? null : LocalDateTime.parse(startTimeStr);
+        LocalDateTime endTime = "null".equals(endTimeStr) ? null : LocalDateTime.parse(endTimeStr);
+        String roomId = "null".equals(startTimeStr) ? null : "room1";
+
+        assertThatThrownBy(() -> bookingSystem.bookRoom(roomId, startTime, endTime))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(expectedMessage);
+
+        verifyNoInteractions(roomRepository, notificationService);
+    }
+
 }
