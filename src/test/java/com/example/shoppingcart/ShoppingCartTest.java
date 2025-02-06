@@ -9,7 +9,7 @@ class ShoppingCartTest {
     void shouldAddItemToCart() {
         ShoppingCart cart = new ShoppingCart();
 
-        cart.addItem("Headphones", 300.00);
+        cart.addItem("Headphones", 300.00, 1);
 
         assertEquals(1, cart.getItemsCount());
     }
@@ -18,8 +18,8 @@ class ShoppingCartTest {
     void shouldDeleteItemFromCart() {
         ShoppingCart cart = new ShoppingCart();
 
-        cart.addItem("Headphones", 300.00);
-        cart.addItem("Microphone", 500.00);
+        cart.addItem("Headphones", 300.00, 1);
+        cart.addItem("Microphone", 500.00, 1);
 
         cart.deleteItem("Headphones");
 
@@ -31,8 +31,8 @@ class ShoppingCartTest {
     void shouldCalculateTotalPrice() {
         ShoppingCart cart = new ShoppingCart();
 
-        cart.addItem("Headphones", 300.00);
-        cart.addItem("Microphone", 500.00);
+        cart.addItem("Headphones", 300.00, 1);
+        cart.addItem("Microphone", 500.00, 1);
 
         assertEquals(800.00, cart.getTotalPrice());
     }
@@ -41,11 +41,22 @@ class ShoppingCartTest {
     void shouldApplyDiscount() {
         ShoppingCart cart = new ShoppingCart();
 
-        cart.addItem("Headphones", 300.00);
-        cart.addItem("Microphone", 500.00);
+        cart.addItem("Headphones", 300.00, 1);
+        cart.addItem("Microphone", 500.00, 1);
 
         cart.applyDiscount(50);
 
         assertEquals(400.00, cart.getTotalPrice());
+    }
+
+    @Test
+    void shouldUpdateNumberOfGivenItem() {
+        ShoppingCart cart = new ShoppingCart();
+
+        cart.addItem("Headphones", 300.00, 1);
+        cart.addItem("Headphones", 300.00, 1);
+
+        assertEquals(2, cart.getItemQuantity("Headphones"));
+        assertEquals(600.00, cart.getTotalPrice());
     }
 }

@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ShoppingCart {
-    private Map<String, Double> items;
+
+    private Map<String, Item> items;
     private double discount;
 
     public ShoppingCart() {
@@ -12,12 +13,13 @@ public class ShoppingCart {
         discount = 0.0;
     }
 
-    public void addItem(String itemName, double price) {
-        items.put(itemName, price);
-    }
-
-    public int getItemsCount() {
-        return items.size();
+    public void addItem(String itemName, double price, int quantity) {
+        if (items.containsKey(itemName)) {
+            Item item = items.get(itemName);
+            item.setQuantity(item.getQuantity() + quantity);
+        } else {
+            items.put(itemName, new Item(itemName, price, quantity));
+        }
     }
 
     public void deleteItem(String itemName) {
@@ -28,13 +30,46 @@ public class ShoppingCart {
         return items.containsKey(itemName);
     }
 
+    public int getItemsCount() {
+        return items.size();
+    }
+
     public double getTotalPrice() {
-        double totalPrice = items.values().stream().mapToDouble(Double::doubleValue).sum();
-        return totalPrice - (totalPrice * discount / 100);
+        double total = items.values().stream()
+                .mapToDouble(item -> item.getPrice() * item.getQuantity())
+                .sum();
+        return total - (total * discount / 100);
     }
 
     public void applyDiscount(double discountPercentage) {
         this.discount = discountPercentage;
     }
-}
 
+    public int getItemQuantity(String itemName) {
+        return items.containsKey(itemName) ? items.get(itemName).getQuantity() : 0;
+    }
+
+    private static class Item {
+        private String name;
+        private double price;
+        private int quantity;
+
+        public Item(String name, double price, int quantity) {
+            this.name = name;
+            this.price = price;
+            this.quantity = quantity;
+        }
+
+        public double getPrice() {
+            return price;
+        }
+
+        public int getQuantity() {
+            return quantity;
+        }
+
+        public void setQuantity(int quantity) {
+            this.quantity = quantity;
+        }
+    }
+}
