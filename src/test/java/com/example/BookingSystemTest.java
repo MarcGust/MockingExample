@@ -3,10 +3,13 @@ package com.example;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.*;
@@ -102,5 +105,32 @@ class BookingSystemTest {
         verify(roomRepository).save(room);
         verify(notificationService).sendBookingConfirmation(any(Booking.class));
     }
-}
 
+    @Test
+    void shouldThrowExceptionForNullBookingId() {
+        assertThatThrownBy(() -> bookingSystem.cancelBooking(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Boknings-id kan inte vara null");
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "'2025-01-01T10:00', '2025-01-01T09:00', 'Kan inte avboka påbörjad eller avslutad bokning'"
+    })
+    void shouldThrowExceptionForCancelingBookingWhenAlreadyStarted(String startTimeStr, String endTimeStr, String expectedMessage) {
+        LocalDateTime startTime = LocalDateTime.parse(startTimeStr);
+        LocalDateTime endTime = LocalDateTime.parse(endTimeStr);
+        Room room = mock(Room.class);
+        Booking booking = mock(Booking.class);
+        when(booking.getStartTime()).thenReturn(startTime);
+        when(room.hasBooking(anyString())).thenReturn(true);
+        when(room.getBooking(anyString())).thenReturn(booking);
+        when(roomRepository.findAll()).thenReturn(List.of(room));
+
+        assertThatThrownBy(() -> bookingSystem.cancelBooking("mockBookingId"))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(expectedMessage);
+
+        verifyNoInteractions(notificationService);
+    }
+}
