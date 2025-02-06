@@ -36,4 +36,16 @@ class ShoppingCartTest {
 
         assertEquals(800.00, cart.getTotalPrice());
     }
+
+    @Test
+    void shouldApplyDiscount() {
+        ShoppingCart cart = new ShoppingCart();
+
+        cart.addItem("Headphones", 300.00);
+        cart.addItem("Microphone", 500.00);
+
+        cart.applyDiscount(50);
+
+        assertEquals(400.00, cart.getTotalPrice());
+    }
 }
