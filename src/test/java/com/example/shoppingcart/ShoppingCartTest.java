@@ -26,4 +26,14 @@ class ShoppingCartTest {
         assertEquals(1, cart.getItemsCount());
         assertFalse(cart.containsItem("Headphones"));
     }
+
+    @Test
+    void shouldCalculateTotalPrice() {
+        ShoppingCart cart = new ShoppingCart();
+
+        cart.addItem("Headphones", 300.00);
+        cart.addItem("Microphone", 500.00);
+
+        assertEquals(800.00, cart.getTotalPrice());
+    }
 }

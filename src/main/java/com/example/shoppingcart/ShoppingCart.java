@@ -1,13 +1,17 @@
 package com.example.shoppingcart;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ShoppingCart {
-    private List<String> items = new ArrayList<>();
+    private Map<String, Double> items;
+
+    public ShoppingCart() {
+        items = new HashMap<>();
+    }
 
     public void addItem(String itemName, double price) {
-        items.add(itemName);
+        items.put(itemName, price);
     }
 
     public int getItemsCount() {
@@ -19,7 +23,11 @@ public class ShoppingCart {
     }
 
     public boolean containsItem(String itemName) {
-        return items.contains(itemName);
+        return items.containsKey(itemName);
+    }
+
+    public double getTotalPrice() {
+        return items.values().stream().mapToDouble(Double::doubleValue).sum();
     }
 }
 
