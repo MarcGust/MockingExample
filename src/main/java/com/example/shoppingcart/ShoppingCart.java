@@ -56,6 +56,10 @@ public class ShoppingCart {
     }
 
     public void applyDiscount(double discountPercentage) {
+        if (discountPercentage < 0 || discountPercentage > 100) {
+            throw new IllegalArgumentException("Discount must be between 0 and 100");
+        }
+
         this.discount = discountPercentage;
     }
 

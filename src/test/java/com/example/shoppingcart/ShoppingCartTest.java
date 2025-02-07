@@ -119,4 +119,15 @@ class ShoppingCartTest {
 
         assertThrows(IllegalArgumentException.class, () -> cart.getItemQuantity(itemNameForTest));
     }
+
+    @ParameterizedTest
+    @CsvSource({
+            "-10.0",
+            "150.0"
+    })
+    void shouldThrowExceptionForWrongDiscountInputs(double discount) {
+        ShoppingCart cart = new ShoppingCart();
+
+        assertThrows(IllegalArgumentException.class, () -> cart.applyDiscount(discount));
+    }
 }
