@@ -1,6 +1,8 @@
 package com.example.shoppingcart;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ShoppingCartTest {
@@ -58,5 +60,27 @@ class ShoppingCartTest {
 
         assertEquals(2, cart.getItemQuantity("Headphones"));
         assertEquals(600.00, cart.getTotalPrice());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "null, 300.00, 1",
+            "'', 300.00, 1",
+            "'Headphones', 0.00, 1",
+            "'Headphones', -100.00, 1",
+            "'Headphones', 300.00, 0",
+            "'Headphones', 300.00, -1"
+    })
+    void shouldThrowExceptionForWrongAddItemInputs(String itemName, double price, int quantity) {
+        ShoppingCart cart = new ShoppingCart();
+
+        final String itemNameForTest;
+        if ("null".equals(itemName)) {
+            itemNameForTest = null;
+        } else {
+            itemNameForTest = itemName;
+        }
+
+        assertThrows(IllegalArgumentException.class, () -> cart.addItem(itemNameForTest, price, quantity));
     }
 }

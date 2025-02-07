@@ -14,6 +14,16 @@ public class ShoppingCart {
     }
 
     public void addItem(String itemName, double price, int quantity) {
+        if (itemName == null || itemName.isEmpty()) {
+            throw new IllegalArgumentException("Item name cannot be null or empty");
+        }
+        if (price <= 0) {
+            throw new IllegalArgumentException("Price must be greater than zero");
+        }
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than zero");
+        }
+
         if (items.containsKey(itemName)) {
             Item item = items.get(itemName);
             item.setQuantity(item.getQuantity() + quantity);
@@ -48,4 +58,6 @@ public class ShoppingCart {
     public int getItemQuantity(String itemName) {
         return items.containsKey(itemName) ? items.get(itemName).getQuantity() : 0;
     }
+
+
 }
