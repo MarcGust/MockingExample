@@ -60,8 +60,10 @@ public class ShoppingCart {
     }
 
     public int getItemQuantity(String itemName) {
+        if (itemName == null || itemName.isEmpty()) {
+            throw new IllegalArgumentException("Item name cannot be null or empty");
+        }
+
         return items.containsKey(itemName) ? items.get(itemName).getQuantity() : 0;
     }
-
-
 }

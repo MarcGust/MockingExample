@@ -101,4 +101,22 @@ class ShoppingCartTest {
 
         assertThrows(IllegalArgumentException.class, () -> cart.deleteItem(itemNameForTest));
     }
+
+    @ParameterizedTest
+    @CsvSource({
+            "null",
+            "''"
+    })
+    void shouldThrowExceptionForWrongGetItemQuantityInputs(String itemName) {
+        ShoppingCart cart = new ShoppingCart();
+
+        final String itemNameForTest;
+        if ("null".equals(itemName)) {
+            itemNameForTest = null;
+        } else {
+            itemNameForTest = itemName;
+        }
+
+        assertThrows(IllegalArgumentException.class, () -> cart.getItemQuantity(itemNameForTest));
+    }
 }
